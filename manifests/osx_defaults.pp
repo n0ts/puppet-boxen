@@ -25,6 +25,7 @@ define boxen::osx_defaults(
 
       if (($type == undef) and (($value == true) or ($value == false))) or ($type =~ /^bool/) {
         $type_ = 'bool'
+        $value_ = $value
 
         $checkvalue = $value ? {
           /(true|yes)/ => '1',
@@ -33,12 +34,36 @@ define boxen::osx_defaults(
 
       } else {
         $type_      = $type
-        $checkvalue = $value
+        $value_     = $type_ ? {
+          /^array$/ => shellquote($value),
+          /^dict$/  => inline_template('<%=
+            @value.flatten.map{|v| "\"#{v.to_s.shellescape}\"" }.join(" ")
+            %>'),
+          default   => $value,
+        }
+
+        $checkvalue = $type_ ? {
+          /^array$/ => inline_template('(<%= @value.join(",") %>)'),
+          /^dict$/  => inline_template('{<%=
+            @value.map{|k, v|
+              if v.is_a?(Hash)
+                "#{k}={" + v.map{|kk, vv| "#{kk}=#{vv};" }.join("") + "}"
+              else
+                "#{k}=#{v};"
+              end
+            }.join("") %>}'),
+          default   => $value,
+        }
       }
 
-      $write_cmd = $type_ ? {
-        undef   => shellquote($default_cmds, 'write', $domain, $key, strip("${value} ")),
-        default => shellquote($default_cmds, 'write', $domain, $key, "-${type_}", strip("${value} "))
+      $write_cmd_ = $type_ ? {
+        /^(array|dict)$/ => shellquote($default_cmds, 'write', $domain, $key, "-${type_}"),
+        undef     => shellquote($default_cmds, 'write', $domain, $key, strip("${value} ")),
+        default   => shellquote($default_cmds, 'write', $domain, $key, "-${type_}", strip("${value} "))
+      }
+      $write_cmd =  $type_ ? {
+        /^(array|dict)$/ => "${write_cmd_} ${value_}",
+        default          => $write_cmd_,
       }
 
       $read_cmd = shellquote($default_cmds, 'read', $domain, $key)
@@ -48,11 +73,17 @@ define boxen::osx_defaults(
         /^bool$/ => 'boolean',
         /^int$/  => 'integer',
         /^dict$/ => 'dictionary',
-        default  => $type_
+        default  => $type_,
       }
       $checktype_cmd = $type_ ? {
         undef   => '',
         default => " && (${readtype_cmd} | awk '/^Type is / { exit \$3 != \"${checktype}\" } { exit 1 }')"
+      }
+
+      $convert_cmd = $type_ ? {
+        /^array$/ => ' | sed -e "s/^ *//g" | tr -d "\"\n"',
+        /^dict$/  => ' | sed -e "s/^ *//g" -e "s/ *= */=/g" | tr -d "\"\n"',
+        default   => undef,
       }
 
       $refreshonly_ = $refreshonly ? {
@@ -60,11 +91,11 @@ define boxen::osx_defaults(
         default => true,
       }
 
-      exec { "osx_defaults write ${host} ${domain}:${key}=>${value}":
+      exec { "osx_defaults write ${host} ${domain}:${key}=>${value_}":
         command     => $write_cmd,
-        unless      => "${read_cmd} && (${read_cmd} | awk '{ exit \$0 != \"${checkvalue}\" }')${checktype_cmd}",
+        unless      => "${read_cmd} && (${read_cmd}${convert_cmd} | awk '{ exit \$0 != \"${checkvalue}\" }')${checktype_cmd}",
         user        => $user,
-        refreshonly => $refreshonly_
+        refreshonly => $refreshonly_,
       }
     } # end present
 
@@ -75,7 +106,7 @@ define boxen::osx_defaults(
       exec { "osx_defaults delete ${host} ${domain}:${key}":
         command => shellquote($default_cmds, 'delete', $domain, $key),
         onlyif  => "${list_cmd} | ${key_search}",
-        user    => $user
+        user    => $user,
       }
     } # end default
   }

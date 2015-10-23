@@ -207,4 +207,46 @@ describe 'boxen::osx_defaults' do
       end
     end
   end
+
+  context 'with a array value' do
+    let(:value) { [ 'val1', 'val2', 'val3' ] }
+    let(:value_str) { 'val1 val2 val3' }
+    let(:value_check) { '(val1,val2,val3)' }
+    let(:params) {
+      { :domain => domain,
+        :key    => key,
+        :value  => value,
+        :type   => 'array',
+      }
+    }
+    let(:array_typecheck) { %Q[(/usr/bin/defaults read-type #{domain} #{key} | awk '/^Type is / { exit $3 != "array" } { exit 1 }')] }
+    let(:convert_cmd) { '| sed -e "s/^ *//g" | tr -d "\"\n"' }
+
+    it do
+      should contain_exec("osx_defaults write  #{domain}:#{key}=>#{value_str}").with(
+        :command => "/usr/bin/defaults write #{domain} #{key} -array #{value_str}",
+        :unless => "/usr/bin/defaults read #{domain} #{key} && (/usr/bin/defaults read #{domain} #{key} #{convert_cmd} | awk '{ exit $0 != \"#{value_check}\" }') && #{array_typecheck}")
+    end
+  end
+
+  context 'with a dict value' do
+    let(:value) { { 'key1' => 'val1', 'key2' => 'val2', 'key3' => 'val3' } }
+    let(:value_str) { '"key1" "val1" "key2" "val2" "key3" "val3"' }
+    let(:value_check) { '{key1=val1;key2=val2;key3=val3;}' }
+    let(:params) {
+      { :domain => domain,
+        :key    => key,
+        :value  => value,
+        :type   => 'dict',
+      }
+    }
+    let(:dict_typecheck) { %Q[(/usr/bin/defaults read-type #{domain} #{key} | awk '/^Type is / { exit $3 != "dictionary" } { exit 1 }')] }
+    let(:convert_cmd) { '| sed -e "s/^ *//g" -e "s/ *= */=/g" | tr -d "\"\n"' }
+
+    it do
+      should contain_exec("osx_defaults write  #{domain}:#{key}=>#{value_str}").with(
+        :command => "/usr/bin/defaults write #{domain} #{key} -dict #{value_str}",
+        :unless => "/usr/bin/defaults read #{domain} #{key} && (/usr/bin/defaults read #{domain} #{key} #{convert_cmd} | awk '{ exit $0 != \"#{value_check}\" }') && #{dict_typecheck}")
+    end
+  end
 end
