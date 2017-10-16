@@ -1,4 +1,5 @@
-# Private: Includes a user's personal configuration based on their GitHub username
+# Private: Includes a user's personal configuration based
+#          on their GitHub username
 #
 # Usage:
 #
@@ -24,6 +25,7 @@ class boxen::personal (
   $osx_apps          = undef,
   $homebrew_packages = [],
   $custom_projects   = {},
+  $dotfiles          = {},
 ){
   include boxen::config
 
@@ -52,7 +54,7 @@ class boxen::personal (
   # class { 'foo': }
   # class { 'bar': }
   $_includes = $merge_hierarchy ? {
-    true      => hiera_array("${name}::includes",undef),
+    true      => hiera_array("${name}::includes",[]),
     default   => $includes
   }
   ensure_resource('class', $_includes)
@@ -77,17 +79,16 @@ class boxen::personal (
   # If any casks/osx_apps are specified, declare them as brewcask packages
   if count($_casks) > 0 { include brewcask }
   ensure_resource('package', $_casks, {
-    'provider'        => 'brewcask',
-    'install_options' => ['--appdir=/Applications',
-                          "--binarydir=${boxen::config::homebrewdir}/bin"],
+    'provider'        => 'brewcask'
   })
 
   # If any homebrew packages are specified , declare them
   $_homebrew_packages = $merge_hierarchy ? {
-    true      => hiera_array("${name}::homebrew_packages",undef),
+    true      => hiera_array("${name}::homebrew_packages",[]),
     default   => $homebrew_packages
   }
   ensure_resource('package', $_homebrew_packages, {
+    'ensure'   => 'latest',
     'provider' => 'homebrew',
   })
 
@@ -107,4 +108,8 @@ class boxen::personal (
     default   => $custom_projects
   }
   create_resources(boxen::project, $_custom_projects)
+
+  if !empty($dotfiles) {
+    ensure_resource('boxen::dotfiles', 'dotfiles', $dotfiles)
+  }
 }
