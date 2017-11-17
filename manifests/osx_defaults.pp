@@ -23,15 +23,15 @@ define boxen::osx_defaults(
         fail('Cannot ensure present without domain, key, and value attributes')
       }
 
-      if (($type == undef) and (($value == true) or ($value == false))) or ($type =~ /^bool/) {
+      if (($type == undef) and (($value == true) or ($value == false))) or ($type == 'bool') {
         $type_ = 'bool'
         $value_ = $value
 
         $checkvalue = $value ? {
+          true         => '1',
           /(true|yes)/ => '1',
-          /(false|no)/ => '0',
+          default      => '0',
         }
-
       } else {
         $type_      = $type
         $value_     = $type_ ? {

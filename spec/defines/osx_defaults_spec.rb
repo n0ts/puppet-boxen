@@ -126,7 +126,7 @@ describe 'boxen::osx_defaults' do
       { :domain => domain,
         :key    => key,
         :value  => value,
-        :type   => 'boolean',
+        :type   => 'bool',
       }
     }
     let(:boolean_typecheck) { %Q[(/usr/bin/defaults read-type #{domain} #{key} | awk '/^Type is / { exit $3 != "boolean" } { exit 1 }')] }

@@ -41,14 +41,14 @@ class boxen::config (
   )
 
   file { [$home,
-          $srcdir,
           $bindir,
           $cachedir,
           $configdir,
           $datadir,
           $envdir,
           $logdir,
-          $socketdir]:
+          $socketdir,
+          $srcdir]:
     ensure => directory,
     links  => follow
   }

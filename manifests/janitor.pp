@@ -8,7 +8,7 @@ class boxen::janitor {
   require homebrew
   # Remove ill-advised cc/gcc symlinks.
 
-  file { ["${homebrew::dir}/bin/cc", "${homebrew::dir}/bin/gcc"]:
+  file { ["${::homebrew_root}/bin/cc", "${::homebrew_root}/bin/gcc"]:
     ensure => absent
   }
 }
