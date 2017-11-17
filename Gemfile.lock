@@ -2,16 +2,14 @@ GEM
   remote: https://rubygems.org/
   specs:
     CFPropertyList (2.2.8)
-    addressable (2.5.2)
-      public_suffix (>= 2.0.2, < 4.0)
+    addressable (2.3.8)
     ansi (1.5.0)
-    boxen23 (3.1.3)
+    boxen23 (3.1.4)
       ansi (~> 1.5)
       hiera (~> 3.4.2)
       highline (~> 1.7.8)
       json_pure (>= 1.8.3, < 2.0)
-      librarian-puppet (~> 2.2)
-      octokit (~> 4.6, <= 4.6.2)
+      octokit (~> 3.8, >= 3.8.0)
       puppet (~> 4.10)
     cardboard23 (2.1.0)
       boxen23 (~> 3.1)
@@ -24,8 +22,6 @@ GEM
       CFPropertyList (~> 2.2)
     faraday (0.9.2)
       multipart-post (>= 1.2, < 3)
-    faraday_middleware (0.10.1)
-      faraday (>= 0.7.4, < 1.0)
     fast_gettext (1.1.0)
     gettext (3.2.4)
       locale (>= 2.0.5)
@@ -37,21 +33,13 @@ GEM
     hiera (3.4.2)
     highline (1.7.8)
     json_pure (1.8.6)
-    librarian-puppet (2.2.3)
-      librarianp (>= 0.6.3)
-      puppet_forge (~> 2.1)
-      rsync
-    librarianp (0.6.4)
-      thor (~> 0.15)
     locale (2.1.2)
     metaclass (0.0.4)
-    minitar (0.6.1)
     mocha (1.3.0)
       metaclass (~> 0.0.1)
     multipart-post (2.0.0)
-    octokit (4.6.2)
-      sawyer (~> 0.8.0, >= 0.5.3)
-    public_suffix (3.0.1)
+    octokit (3.8.0)
+      sawyer (~> 0.6.0, >= 0.5.3)
     puppet (4.10.9)
       facter (> 2.0, < 4)
       gettext-setup (>= 0.10, < 1)
@@ -68,12 +56,6 @@ GEM
     puppet-lint (2.3.3)
     puppet-syntax (2.4.1)
       rake
-    puppet_forge (2.2.8)
-      faraday (~> 0.9.0)
-      faraday_middleware (>= 0.9.0, < 0.11.0)
-      gettext-setup (~> 0.11)
-      minitar
-      semantic_puppet (~> 1.0)
     puppetlabs_spec_helper (2.5.0)
       mocha (~> 1.0)
       puppet-lint (~> 2.0)
@@ -95,17 +77,14 @@ GEM
     rspec-puppet (2.6.9)
       rspec
     rspec-support (3.7.0)
-    rsync (1.0.9)
-    sawyer (0.8.1)
-      addressable (>= 2.3.5, < 2.6)
-      faraday (~> 0.8, < 1.0)
-    semantic_puppet (1.0.1)
-      gettext-setup (>= 0.3)
+    sawyer (0.6.0)
+      addressable (~> 2.3.5)
+      faraday (~> 0.8, < 0.10)
     text (1.3.1)
-    thor (0.20.0)
 
 PLATFORMS
   ruby
+  universal-darwin-16
   x86_64-darwin-16
 
 DEPENDENCIES
