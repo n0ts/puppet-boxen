@@ -22,23 +22,6 @@ class boxen::config (
   $download_url_base = undef,
   $hiera_merge_hierarchy = undef
 ) {
-  validate_string(
-    $home,
-    $bindir,
-    $cachedir,
-    $configdir,
-    $datadir,
-    $envdir,
-    $homebrewdir,
-    $logdir,
-    $repodir,
-    $reponame,
-    $socketdir,
-    $srcdir,
-    $login,
-    $repo_url_template,
-    $download_url_base,
-  )
 
   file { [$home,
           $bindir,
