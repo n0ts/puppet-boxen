@@ -8,7 +8,7 @@ module Puppet::Parser::Functions
 
       next if class_name =~ /all\.pp$/
 
-      function_include [class_name.gsub(/\.pp$/, '')]
+      call_function('include', ["projects::#{class_name.gsub(/\.pp$/, '')}"])
     end
   end
 end

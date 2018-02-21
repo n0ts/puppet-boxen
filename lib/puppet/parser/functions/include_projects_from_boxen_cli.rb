@@ -12,7 +12,7 @@ module Puppet::Parser::Functions
 
         if File.exist?(path)
           warning "Setting up '#{project}'. This can be made permanent by having 'include projects::#{project}' in your personal manifest."
-          function_include ["projects::#{project}"]
+          call_function('include', ["projects::#{project}"])
         else
           warning "Don't know anything about '#{project}'. Help out by defining it at '#{path}'."
         end
