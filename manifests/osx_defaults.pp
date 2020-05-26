@@ -27,10 +27,10 @@ define boxen::osx_defaults(
         $type_ = 'bool'
         $value_ = $value
 
-        $checkvalue = $value ? {
-          true         => '1',
-          /(true|yes)/ => '1',
-          default      => '0',
+        case $value {
+          /'true'|true|'yes'|yes/:  { $checkvalue = '1' }
+          /'false'|false|'no'|no/:  { $checkvalue = '0' }
+          default:                  { $checkvalue = nil }
         }
       } else {
         $type_      = $type
@@ -70,6 +70,7 @@ define boxen::osx_defaults(
 
       $readtype_cmd = shellquote($default_cmds, 'read-type', $domain, $key)
       $checktype = $type_ ? {
+
         /^bool$/ => 'boolean',
         /^int$/  => 'integer',
         /^dict$/ => 'dictionary',
